@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito de Compras</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1, h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    ul {
+      padding: 0;
+    }
+    
+    li {
+      list-style: none;
+      margin-bottom: 15px;
+    }
+    
+    .product-container {
+      display: flex;
+      flex-wrap: wrap; 
+      justify-content: space-between; 
+    }
+    .product {
+      flex: 1 0 32%; 
+      margin-bottom: 20px;
+    }
+    
+    .product, .cart-item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    button {
+      padding: 5px 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .cart-item {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Busca tu apartamento ideal</h1>
+    <div class="product-container">
+      <li v-for="product in products" :key="product.id" class="product"> <!--Bucle que itera por todos los productos, apartamentos en este caso y los muestra, con sus correspondientes datos.-->
+        <img :src="product.image" :alt="product.name" width="100" height="100" /> <!--Imágen del producto-->
+        <div>
+          <strong>{{ product.name }}</strong> ({{product.price.toLocaleString() }} €)
+          <br>
+          {{ product.city }}, {{ product.country}}
+          </br>
+          <label for="quantity">Cantidad:</label>
+          <input type="number" id="quantity" v-model="productQuantity"> <!--Aquí en v-model creo productQuantity al que posteriormente hare referencia-->
+          <button @click="addToCart(product)">Añadir al carrito</button>
+        </div>
+      </li>
+    </div>
+    <h2>Carrito</h2>
+    <ul v-if="cart.length > 0"> <!--Si el carrito tiene mas de 0 artículos se genera el bucle que muestra el producto, la cantidad y el precio total.-->
+      <li v-for="item in cart" :key="item.id" class="cart-item">
+        {{ item.title }} - Cantidad: {{ item.quantity }} - Total: {{ (item.quantity * item.price).toFixed(2) }} €
+      </li>
+    </ul>
+    <p v-else>El carrito está vacío</p><!--Si el carrito es menor que cero, no tiene ningún producto añadido, con lo cual está vacío.-->
+
+    <p v-if="totalPrice > 0">Total del carrito: {{ totalPrice.toFixed(2) }} €</p>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({  // Creo la aplicación e introduzco los datos que maneja, los diferentes productos y el carrito.
+      data() {
+        return {
+            products: [        
+        { id: 1, name: 'Lujo', price: 500 , city: 'Nueva York', country: 'USA', image: "img/uno.webp"},
+        { id: 2, name: 'Relax', price: 850, city: 'Manchester', country: 'England', image: "img/dos.webp" },
+        { id: 3, name: 'Desconexión', price: 1200, city: 'San Sebastian', country: 'Spain', image: "img/tres.webp"},
+        { id: 4, name: 'Vintage', price: 990, city: 'Madrid', country: 'Spain', image: "img/cuatro.webp"},
+        { id: 5, name: 'Monmartre', price: 1900, city: 'París', country: 'France', image: "img/cinco.webp"},
+        { id: 6, name: 'London', price: 1800, city: 'Londres', country: 'England', image: "img/seis.webp"},
+        { id: 7, name: 'Moderno', price: 1200, city: 'Nápoles', country: 'Italy', image: "img/siete.webp"},
+        { id: 8, name: 'Estilo', price: 1600, city: 'Roma', country: 'Italy', image: "img/ocho.webp"},
+        { id: 9, name: 'NY', price: 3400, city: 'Nueva York', country: 'USA', image: "img/nueve.webp"},
+        { id: 10,name: 'Cosmopolita', price: 890, city: 'Barcelona', country: 'Spain', image: "img/diez.webp"}
+      ],
+          cart: [],
+        };
+      }, 
+      computed: {
+        totalPrice() {
+          return this.cart.reduce((sum, item) => sum + item.price * item.quantity, 0); // Cálculo total del carrito. 
+        },
+      },
+      methods: {
+        addToCart(product) {
+          const existingItem = this.cart.find((item) => item.id === product.id); // this.cart es un array que almacena los productos del carrito.
+          if (existingItem) {
+            existingItem.quantity += 1; // Si se encuentra un producto con el mismo id en el carrito, se incrementa en uno la cantidad.
+          } else {
+            this.cart.push({ ...product, quantity: this.productQuantity }); // Hago referencia a productQuantity porque sino únicamente me sumaba una unidad.
+            this.productQuantity = 1; // Reseteo a uno la cantidad después de añadir los productos al carrito.
+          }
+        },
+      },
+    }).mount('#app');
+  </script>
+</body>
+</html>
+
